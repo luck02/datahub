@@ -225,7 +225,7 @@ def get_column_type(
     report: DBTSourceReport, dataset_name: str, column_type: str
 ) -> SchemaFieldDataType:
     """
-    Maps SQLAlchemy types (https://docs.sqlalchemy.org/en/13/core/type_basics.html) to corresponding schema types
+    Maps known DBT types to datahub types
     """
 
     TypeClass: Any = None
