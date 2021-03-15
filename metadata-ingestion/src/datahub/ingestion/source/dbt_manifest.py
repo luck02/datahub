@@ -23,11 +23,20 @@ from datahub.metadata.com.linkedin.pegasus2avro.schema import (
     SchemaMetadata,
     StringTypeClass,
 )
+
+from datahub.metadata.com.linkedin.pegasus2avro.dataset import (
+    Upstream,
+    UpstreamClass,
+    UpstreamLineage,
+    UpstreamLineageClass,
+    DatasetLineageType
+)
+
 from datahub.metadata.schema_classes import DatasetPropertiesClass
 from datahub.ingestion.source.metadata_common import MetadataWorkUnit
 from datahub.metadata.com.linkedin.pegasus2avro.mxe import MetadataChangeEvent
 import json
-from pprint import pformat
+from pprint import pprint
 
 logger = logging.getLogger(__name__)
 
@@ -48,50 +57,157 @@ class DBTManifestConfig(ConfigModel):
     manifest_path: str = None
     catalog_path: str = None
 
-def get_dataset_name(dbt_node) -> str:
-    return dbt_node['relation_name']
-
 class DBTColumn():
     name: str
     comment: str
     index: int
     dataType: str
 
+    def __repr__(self):
+         fields = tuple("{}={}".format(k, v) for k, v in self.__dict__.items())
+         return self.__class__.__name__ + str(tuple(sorted(fields))).replace("\'","")
+
 class DBTNode():
     dbt_name: str
     database: str
     schema: str
     dbt_file_path: str
-    node_type: str # table, view, ephemeral
-    dependencies: list[str]
+    node_type: str # source, model
+    materialization: str # table, view, ephemeral
+    relation_name: str
     columns: list[DBTColumn]
+    upstream_urns: list[str]
+    datahub_urn: str
 
-def loadManifestAndCatalog(manifest_path, catalog_path) -> list[DBTNode]:
-    nodes = list[DBTNode]
+    def __repr__(self):
+         fields = tuple("{}={}".format(k, v) for k, v in self.__dict__.items())
+         return self.__class__.__name__ + str(tuple(sorted(fields))).replace("\'","")
 
-    with open(manifest_path, "r") as f:
-        dbt_manifest_json = json.load(f)
-        nodes = dbt_manifest_json['nodes']
-        sources = dbt_manifest_json['sources']
+def get_columns(catalog_node) -> list[DBTColumn]:
+    columns = []
 
-        logger.info('loading {} nodes, {} sources'.format(len(nodes), len(sources)))
+    raw_columns = catalog_node['columns']
 
-        for key in nodes:
-            node = nodes[key]
-            dataset_name = get_dataset_name(node) 
+    for key in raw_columns:
+        raw_column = raw_columns[key]
 
-            dbtNode = DBTNode()
-            dbtNode.dbt_name = key
-            dbtNode.database = node['database']
-            dbtNode.schema = node['schema']
-            dbtNode.dbt_file_path = node['original_file_path']
-            dbtNode.node_type = node['config']['materialized']
-            dbtNode.dependencies = node['depends_on']['nodes']
-            if dbtNode.node_type != 'ephemeral':
-                dbtNode.columns = getColumns(sources[dbtNode.dbt_name])
-            logger.info(pformat(vars(dbtNode)))
+        dbtCol = DBTColumn() 
+        dbtCol.comment = raw_column['comment']
+        dbtCol.dataType = raw_column['type']
+        dbtCol.index = raw_column['index']
+        dbtCol.name = raw_column['name']
+
+        columns.append(dbtCol)
+    return columns 
+
+def extract_dbt_entities(nodes, catalog, platform: str, environment: str) -> List[DBTNode]:
+    dbt_entities = []
+
+    for key in nodes:
+        node = nodes[key]
+        dbtNode = DBTNode()
+        
+        dbtNode.dbt_name = key
+        dbtNode.node_type = node['resource_type']
+        dbtNode.relation_name = node['relation_name']
+        dbtNode.database = node['database']
+        dbtNode.schema = node['schema']
+        dbtNode.dbt_file_path = node['original_file_path']
+
+        if 'materialized' in node['config'].keys():
+            # It's a model
+            dbtNode.materialization = node['config']['materialized']
+            dbtNode.upstream_urns = get_upstreams(
+                node['depends_on']['nodes'], 
+                nodes,
+                platform,
+                environment
+            )
+        else:
+            # It's a source 
+            dbtNode.materialization = catalog[key]['metadata']['type']
+            dbtNode.upstream_urns = []
+
+        if dbtNode.materialization != 'ephemeral':
+            dbtNode.columns = get_columns(catalog[dbtNode.dbt_name])
+
+        dbtNode.datahub_urn = get_urn_from_dbtNode(dbtNode.database, dbtNode.schema, dbtNode.relation_name, platform, environment)
+        
+        dbt_entities.append(dbtNode)
+
+    return dbt_entities
 
 
+def loadManifestAndCatalog(manifest_path, catalog_path, platform, environment) -> list[DBTNode]:
+    manifest_nodes = list[DBTNode]
+    
+    with open(manifest_path, "r") as manifest:
+        with open(catalog_path, "r") as catalog: 
+            dbt_manifest_json = json.load(manifest)
+            dbt_catalog_json = json.load(catalog)
+
+            manifest_nodes = dbt_manifest_json['nodes']
+            manifest_sources = dbt_manifest_json['sources']
+
+            all_manifest_entities = manifest_nodes | manifest_sources
+
+            catalog_nodes = dbt_catalog_json['nodes']
+            catalog_sources = dbt_catalog_json['sources']
+
+            all_catalog_entities = catalog_nodes | catalog_sources
+
+            logger.info('loading {} nodes, {} sources'.format(len(all_manifest_entities), len(all_catalog_entities)))
+    
+            nodes = extract_dbt_entities(all_manifest_entities, all_catalog_entities, platform, environment)
+
+            return nodes
+
+def get_urn_from_dbtNode(database: str, schema: str, relation_name: str, platform: str, env:str) -> str:
+    db_fqn = f"{database}.{schema}.{relation_name}".replace('"', '')
+    return f"urn:li:dataset:(urn:li:dataPlatform:{platform},{db_fqn},{env})"
+
+def get_custom_properties(node: DBTNode) -> List[dict[str,str]]:
+    tags = {}
+    tags['dbt_node_type'] = node.node_type
+    tags['materialization'] = node.materialization
+    tags['dbt_file_path'] = node.dbt_file_path
+    return tags
+
+def get_upstreams(upstreams: List[str], all_nodes, platform: str, environment: str) -> List[str]:
+    upstream_urns = []
+
+    for upstream in upstreams:
+        upstream_node = all_nodes[upstream]
+
+        upstream_urns.append(get_urn_from_dbtNode(
+            upstream_node['database'],
+            upstream_node['schema'],
+            upstream_node['relation_name'],
+            platform,
+            environment
+        ))
+
+    return upstream_urns
+
+def get_upstream_lineage(upstream_urns: List[str]) -> UpstreamLineage:
+    ucl: List[uc] = []
+
+    for dep in upstream_urns:
+        uc = UpstreamClass(
+        dataset=dep, 
+        auditStamp=AuditStamp(
+            actor="urn:li:corpUser:dbt_executor",
+            time=1581407189000 # replace with system timestamp etc.
+        ),
+        type="TRANSFORMED"
+        )
+        ucl.append(uc)
+
+    ulc = UpstreamLineageClass(
+        upstreams = ucl
+    )
+
+    return ulc
 
 class DBTManifestSource(Source):
     """A Base class for all SQL Sources that use SQLAlchemy to extend"""
@@ -113,36 +229,34 @@ class DBTManifestSource(Source):
 
         logger.info(self)
 
-        nodes = loadManifestAndCatalog(self.config.manifest_path, self.config.catalog_path)
+        nodes = loadManifestAndCatalog(self.config.manifest_path, self.config.catalog_path, platform, env)
 
-        #logger.info(nodes)
-        # with open(self.config.manifest_path, "r") as f:
-        #     dbt_manifest_json =  json.load(f)
-        #     nodes = dbt_manifest_json['nodes']
-        #     sources = dbt_manifest_json['sources']
-        #     logger.info('loading {} nodes, {} sources'.format(len(nodes), len(sources)))
+        for node in nodes:
+            logger.info(f"Converting node {node.dbt_name}")
 
-        #     for key in nodes:
-        #         node = nodes[key]
-        #         mce = MetadataChangeEvent()
+            mce = MetadataChangeEvent()
 
-        #         dataset_name = get_dataset_name(node)
-                
-        #         dataset_snapshot = DatasetSnapshot()
-        #         dataset_snapshot.urn = f"urn:li:dataset:(urn:li:dataPlatform:{platform},{dataset_name},{env})"
-                
-        #         # schema_metadata = get_schema_metadata(
-        #         #     self.report, dataset_name, platform, columns
-        #         # )
+            dataset_snapshot = DatasetSnapshot()
+            dataset_snapshot.urn = node.datahub_urn
+            logger.info(dataset_snapshot.urn)
+            custom_properties = get_custom_properties(node)
 
-        #         # dataset_snapshot.aspects.append(schema_metadata)
-        #         mce.proposedSnapshot = dataset_snapshot
+            dbt_properties = DatasetPropertiesClass(
+                description=node.dbt_name,
+                customProperties=custom_properties
+            )
 
-        #         wu = MetadataWorkUnit(id=dataset_name, mce=mce)
+            dataset_snapshot.aspects.append(dbt_properties)
+            logger.info(f"Converting node {node}")
 
-        #         self.report.report_workunit(wu)
-        #         yield wu
+            upstreams = get_upstream_lineage(node.upstream_urns)
+            if upstreams is not None:
+                dataset_snapshot.aspects.append(upstreams)
 
+
+            mce.proposedSnapshot = dataset_snapshot
+            wu = MetadataWorkUnit(id=dataset_snapshot.urn, mce=mce)
+            yield  wu
 
     def get_report(self):
         return self.report
