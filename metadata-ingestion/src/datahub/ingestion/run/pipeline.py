@@ -56,7 +56,6 @@ class Pipeline:
         self.ctx = PipelineContext(run_id=self.config.run_id)
 
         source_type = self.config.source.type
-        logger.info(source_type)
         source_class = source_registry.get(source_type)
         self.source: Source = source_class.create(
             self.config.source.dict().get("config", {}), self.ctx
