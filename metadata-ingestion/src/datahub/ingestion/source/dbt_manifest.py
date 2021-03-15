@@ -61,7 +61,7 @@ class DBTColumn():
     name: str
     comment: str
     index: int
-    dataType: str
+    data_type: str
 
     def __repr__(self):
          fields = tuple("{}={}".format(k, v) for k, v in self.__dict__.items())
@@ -83,6 +83,7 @@ class DBTNode():
          fields = tuple("{}={}".format(k, v) for k, v in self.__dict__.items())
          return self.__class__.__name__ + str(tuple(sorted(fields))).replace("\'","")
 
+
 def get_columns(catalog_node) -> list[DBTColumn]:
     columns = []
 
@@ -93,10 +94,9 @@ def get_columns(catalog_node) -> list[DBTColumn]:
 
         dbtCol = DBTColumn() 
         dbtCol.comment = raw_column['comment']
-        dbtCol.dataType = raw_column['type']
+        dbtCol.data_type = raw_column['type']
         dbtCol.index = raw_column['index']
         dbtCol.name = raw_column['name']
-
         columns.append(dbtCol)
     return columns 
 
@@ -130,6 +130,8 @@ def extract_dbt_entities(nodes, catalog, platform: str, environment: str) -> Lis
 
         if dbtNode.materialization != 'ephemeral':
             dbtNode.columns = get_columns(catalog[dbtNode.dbt_name])
+        else:
+            dbtNode.columns = []
 
         dbtNode.datahub_urn = get_urn_from_dbtNode(dbtNode.database, dbtNode.schema, dbtNode.relation_name, platform, environment)
         
@@ -209,6 +211,64 @@ def get_upstream_lineage(upstream_urns: List[str]) -> UpstreamLineage:
 
     return ulc
 
+_field_type_mapping = {
+    'boolean': BooleanTypeClass,
+    'date': StringTypeClass, # Is there no DateTypeClass?
+    'numeric': NumberTypeClass,
+    'numeric(5,2)': NumberTypeClass, # todo: strip parantheses
+    'text': StringTypeClass,
+    'timestamp with time zone': StringTypeClass,
+    'integer': NumberTypeClass
+}
+
+def get_column_type(
+    report: DBTSourceReport, dataset_name: str, column_type: str
+) -> SchemaFieldDataType:
+    """
+    Maps SQLAlchemy types (https://docs.sqlalchemy.org/en/13/core/type_basics.html) to corresponding schema types
+    """
+
+    TypeClass: Any = None
+    for key in _field_type_mapping.keys():
+        if key == column_type:
+            TypeClass = _field_type_mapping[column_type]
+            break
+
+    if TypeClass is None:
+        report.report_warning(
+            dataset_name, f"unable to map type {column_type} to metadata schema"
+        )
+        TypeClass = NullTypeClass
+
+    return SchemaFieldDataType(type=TypeClass())
+
+
+def get_schema_metadata(
+    report: DBTSourceReport, node: DBTNode, platform: str
+) -> SchemaMetadata:
+    canonical_schema: List[SchemaField] = []
+    for column in node.columns:
+        field = SchemaField(
+            fieldPath=column.name,
+            nativeDataType=column.data_type,
+            type=get_column_type(report, node.dbt_name, column.data_type),
+            description=column.comment,
+        )
+        canonical_schema.append(field)
+
+    actor, sys_time = "urn:li:corpuser:etl", int(time.time()) * 1000
+    schema_metadata = SchemaMetadata(
+        schemaName=node.dbt_name,
+        platform=f"urn:li:dataPlatform:{platform}",
+        version=0,
+        hash="",
+        platformSchema=MySqlDDL(tableSchema=""),
+        created=AuditStamp(time=sys_time, actor=actor),
+        lastModified=AuditStamp(time=sys_time, actor=actor),
+        fields=canonical_schema,
+    )
+    return schema_metadata
+
 class DBTManifestSource(Source):
     """A Base class for all SQL Sources that use SQLAlchemy to extend"""
     @classmethod
@@ -253,6 +313,8 @@ class DBTManifestSource(Source):
             if upstreams is not None:
                 dataset_snapshot.aspects.append(upstreams)
 
+            schema_metadata = get_schema_metadata(self.report, node, platform)
+            dataset_snapshot.aspects.append(schema_metadata)
 
             mce.proposedSnapshot = dataset_snapshot
             wu = MetadataWorkUnit(id=dataset_snapshot.urn, mce=mce)
