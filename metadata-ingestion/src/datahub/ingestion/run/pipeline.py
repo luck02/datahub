@@ -62,7 +62,6 @@ class Pipeline:
             self.config.source.dict().get("config", {}), self.ctx
         )
         logger.debug(f"Source type:{source_type},{source_class} configured")
-        logger.info(self.source)
 
         sink_type = self.config.sink.type
         sink_class = sink_registry.get(sink_type)
