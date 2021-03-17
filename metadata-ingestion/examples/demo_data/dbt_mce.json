@@ -7,9 +7,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "model.sample_dbt.payments_base"
-                        },
+                        "description": "model.sample_dbt.payments_base",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -24,7 +22,7 @@
                         "upstreams": [
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -33,7 +31,7 @@
                             },
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -42,7 +40,7 @@
                             },
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -51,7 +49,7 @@
                             },
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -60,7 +58,7 @@
                             },
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -69,7 +67,7 @@
                             },
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -78,7 +76,7 @@
                             },
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -94,12 +92,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -209,9 +207,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "model.sample_dbt.payments_by_customer_by_month"
-                        },
+                        "description": "model.sample_dbt.payments_by_customer_by_month",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -226,7 +222,7 @@
                         "upstreams": [
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -242,12 +238,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -318,9 +314,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "model.sample_dbt.customer_details"
-                        },
+                        "description": "model.sample_dbt.customer_details",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -335,7 +329,7 @@
                         "upstreams": [
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -344,7 +338,7 @@
                             },
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -353,7 +347,7 @@
                             },
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -369,12 +363,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -405,9 +399,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "model.sample_dbt.monthly_billing_with_cust"
-                        },
+                        "description": "model.sample_dbt.monthly_billing_with_cust",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -422,7 +414,7 @@
                         "upstreams": [
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -431,7 +423,7 @@
                             },
                             {
                                 "auditStamp": {
-                                    "time": 1615941100000,
+                                    "time": 1615955104000,
                                     "actor": "urn:li:corpuser:dbt_executor",
                                     "impersonator": null
                                 },
@@ -447,12 +439,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -536,9 +528,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "source.sample_dbt.pagila.payment_p2020_01"
-                        },
+                        "description": "source.sample_dbt.pagila.payment_p2020_01",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -559,12 +549,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -674,9 +664,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "source.sample_dbt.pagila.payment_p2020_02"
-                        },
+                        "description": "source.sample_dbt.pagila.payment_p2020_02",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -697,12 +685,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -812,9 +800,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "source.sample_dbt.pagila.payment_p2020_03"
-                        },
+                        "description": "source.sample_dbt.pagila.payment_p2020_03",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -835,12 +821,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -950,9 +936,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "source.sample_dbt.pagila.payment_p2020_04"
-                        },
+                        "description": "source.sample_dbt.pagila.payment_p2020_04",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -973,12 +957,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -1088,9 +1072,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "source.sample_dbt.pagila.payment_p2020_05"
-                        },
+                        "description": "source.sample_dbt.pagila.payment_p2020_05",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -1111,12 +1093,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -1226,9 +1208,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "source.sample_dbt.pagila.payment_p2020_06"
-                        },
+                        "description": "source.sample_dbt.pagila.payment_p2020_06",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -1249,12 +1229,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -1364,9 +1344,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "source.sample_dbt.pagila.customer"
-                        },
+                        "description": "source.sample_dbt.pagila.customer",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -1387,12 +1365,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -1554,9 +1532,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "source.sample_dbt.pagila.address"
-                        },
+                        "description": "source.sample_dbt.pagila.address",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -1577,12 +1553,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
@@ -1718,9 +1694,7 @@
             "aspects": [
                 {
                     "com.linkedin.pegasus2avro.dataset.DatasetProperties": {
-                        "description": {
-                            "string": "source.sample_dbt.pagila.city"
-                        },
+                        "description": "source.sample_dbt.pagila.city",
                         "uri": null,
                         "tags": [],
                         "customProperties": {
@@ -1741,12 +1715,12 @@
                         "platform": "urn:li:dataPlatform:dbt",
                         "version": 0,
                         "created": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },
                         "lastModified": {
-                            "time": 1615941100000,
+                            "time": 1615955104000,
                             "actor": "urn:li:corpuser:dbt_executor",
                             "impersonator": null
                         },

@@ -1,5 +1,8 @@
 import logging
 import time
+import json
+import re 
+
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Iterable, List, Optional, Tuple
@@ -35,9 +38,6 @@ from datahub.metadata.com.linkedin.pegasus2avro.dataset import (
 from datahub.metadata.schema_classes import DatasetPropertiesClass
 from datahub.ingestion.source.metadata_common import MetadataWorkUnit
 from datahub.metadata.com.linkedin.pegasus2avro.mxe import MetadataChangeEvent
-import json
-from pprint import pprint
-import re 
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class DBTSourceReport(SourceReport):
     tables_scanned = 0
     filtered: List[str] = field(default_factory=list)
 
-    def report_table_scanned(self, table_name: str) -> None:
+    def report_dbt_node_ingested(self, table_name: str) -> None:
         self.tables_scanned += 1
 
     def report_dropped(self, table_name: str) -> None:
@@ -292,19 +292,15 @@ class DBTManifestSource(Source):
         env: str = "PROD"
         sql_config = self.config
         platform = self.platform
-
-        logger.info(self)
-
         nodes = loadManifestAndCatalog(self.config.manifest_path, self.config.catalog_path, platform, env)
 
         for node in nodes:
-            logger.info(f"Converting node {node.dbt_name}")
+            self.report.report_dbt_node_ingested(node.dbt_name)
 
             mce = MetadataChangeEvent()
 
             dataset_snapshot = DatasetSnapshot()
             dataset_snapshot.urn = node.datahub_urn
-            logger.info(dataset_snapshot.urn)
             custom_properties = get_custom_properties(node)
 
             dbt_properties = DatasetPropertiesClass(
@@ -313,7 +309,6 @@ class DBTManifestSource(Source):
             )
 
             dataset_snapshot.aspects.append(dbt_properties)
-            logger.info(f"Converting node {node}")
 
             upstreams = get_upstream_lineage(node.upstream_urns)
             if upstreams is not None:
