@@ -64,6 +64,12 @@ try:
 except ImportError as e:
     source_registry.register_disabled("kafka", e)
 
+try: 
+    from .dbt_manifest import DBTManifestSource
+
+    source_registry.register("dbt_manifest", DBTManifestSource)
+except ImportError as e:
+    source_registry.register_disabled("dbt_manifest", e)
 
 try:
     from .ldap import LDAPSource
