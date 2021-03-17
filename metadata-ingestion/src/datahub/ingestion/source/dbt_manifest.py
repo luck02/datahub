@@ -37,6 +37,7 @@ from datahub.ingestion.source.metadata_common import MetadataWorkUnit
 from datahub.metadata.com.linkedin.pegasus2avro.mxe import MetadataChangeEvent
 import json
 from pprint import pprint
+import re 
 
 logger = logging.getLogger(__name__)
 
@@ -194,12 +195,14 @@ def get_upstreams(upstreams: List[str], all_nodes, platform: str, environment: s
 def get_upstream_lineage(upstream_urns: List[str]) -> UpstreamLineage:
     ucl: List[uc] = []
 
+    actor, sys_time = "urn:li:corpuser:dbt_executor", int(time.time()) * 1000
+
     for dep in upstream_urns:
         uc = UpstreamClass(
         dataset=dep, 
         auditStamp=AuditStamp(
-            actor="urn:li:corpUser:dbt_executor",
-            time=1581407189000 # replace with system timestamp etc.
+            actor=actor,
+            time=sys_time # replace with system timestamp etc.
         ),
         type="TRANSFORMED"
         )
@@ -215,7 +218,6 @@ _field_type_mapping = {
     'boolean': BooleanTypeClass,
     'date': StringTypeClass, # Is there no DateTypeClass?
     'numeric': NumberTypeClass,
-    'numeric(5,2)': NumberTypeClass, # todo: strip parantheses
     'text': StringTypeClass,
     'timestamp with time zone': StringTypeClass,
     'integer': NumberTypeClass
@@ -228,10 +230,14 @@ def get_column_type(
     Maps known DBT types to datahub types
     """
 
+    pattern = re.compile('[\w ]+') # drop all non alphanumerics
+    match = pattern.match(column_type)
+    column_type_stripped = match.group()
+
     TypeClass: Any = None
     for key in _field_type_mapping.keys():
-        if key == column_type:
-            TypeClass = _field_type_mapping[column_type]
+        if key == column_type_stripped:
+            TypeClass = _field_type_mapping[column_type_stripped]
             break
 
     if TypeClass is None:
@@ -256,7 +262,7 @@ def get_schema_metadata(
         )
         canonical_schema.append(field)
 
-    actor, sys_time = "urn:li:corpuser:etl", int(time.time()) * 1000
+    actor, sys_time = "urn:li:corpuser:dbt_executor", int(time.time()) * 1000
     schema_metadata = SchemaMetadata(
         schemaName=node.dbt_name,
         platform=f"urn:li:dataPlatform:{platform}",
