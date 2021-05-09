@@ -4,8 +4,12 @@ source:
   config:
     manifest_path: "./your/dbt/manifest.json"
     catalog_path: "./your/dbt/catalog.json"
-
+    target_platform: "postgres"
 sink:
-  type: "datahub-rest"
+  type: "file"
   config:
-    server: 'http://localhost:8080'
+    filename: './dbt_out.json'
+# sink:
+#   type: "datahub-rest"
+#   config:
+#     server: 'http://localhost:8080'
