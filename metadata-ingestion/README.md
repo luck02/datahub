@@ -595,9 +595,7 @@ Pull metadata from DBT output files:
 - [dbt catalog file](https://docs.getdbt.com/reference/artifacts/catalog-json)
   - This file contains schema data.
   - DBT does not record schema data for Ephemeral models, as such datahub will show Ephemeral models in the lineage, however there will be no associated schema for Ephemeral models
-  - Not required if target_platform configuration provided.
-- target_platform: Optional.
-  - If provided the ingestion tool will not attempt to load a catalog file.
+- target_platform: Optional
   - In this case we use DBT metadata to enrich an existing data platform with DBT sourced lineage and metadata.
 
 ```yml
