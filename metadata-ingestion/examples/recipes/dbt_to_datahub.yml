@@ -4,8 +4,8 @@ source:
   config:
     manifest_path: "./your/dbt/manifest.json"
     catalog_path: "./your/dbt/catalog.json"
-    #target_platform: "[platform you are targeting]"
+    #target_platform: "[target platform]"
 sink:
-  type: "file"
+  type: "datahub-rest"
   config:
-    filename: './dbt_out.json'
+    server: 'http://localhost:8080'
