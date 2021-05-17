@@ -36,7 +36,8 @@ class DBTConfig(ConfigModel):
     manifest_path: str
     catalog_path: str
     env: str = "PROD"
-    target_platform: str = "dbt"
+    target_platform: str
+    load_schemas: bool
 
 
 class DBTColumn:
@@ -87,7 +88,7 @@ def get_columns(catalog_node: dict) -> List[DBTColumn]:
 def extract_dbt_entities(
     nodes: Dict[str, dict],
     catalog: Dict[str, dict],
-    platform: str,
+    load_catalog: bool,
     target_platform: str,
     environment: str,
 ) -> List[DBTNode]:
@@ -117,7 +118,7 @@ def extract_dbt_entities(
             dbtNode.upstream_urns = []
 
         if (
-            dbtNode.materialization != "ephemeral" and platform == target_platform
+            dbtNode.materialization != "ephemeral" and load_catalog
         ):  # we don't want columns if platform isn't 'dbt'
             logger.debug("Loading schema info")
             dbtNode.columns = get_columns(catalog[dbtNode.dbt_name])
@@ -140,7 +141,7 @@ def extract_dbt_entities(
 def loadManifestAndCatalog(
     manifest_path: str,
     catalog_path: str,
-    platform: str,
+    load_catalog: bool,
     target_platform: str,
     environment: str,
 ) -> List[DBTNode]:
@@ -162,7 +163,7 @@ def loadManifestAndCatalog(
             nodes = extract_dbt_entities(
                 all_manifest_entities,
                 all_catalog_entities,
-                platform,
+                load_catalog,
                 target_platform,
                 environment,
             )
@@ -317,7 +318,7 @@ class DBTSource(Source):
         nodes = loadManifestAndCatalog(
             self.config.manifest_path,
             self.config.catalog_path,
-            platform,
+            self.config.load_schemas,
             self.config.target_platform,
             self.config.env,
         )
